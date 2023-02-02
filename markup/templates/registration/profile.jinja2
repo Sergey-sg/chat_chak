@@ -1,0 +1,21 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}{{_('Personal Area')}}{% endblock title %}
+
+{% block content %}
+    <div class="row"></div>
+        <!-- user orders -->
+        <div class="container p-3 border">
+            <h6>{{_('My orders')}}</h6>
+            <hr>
+            {% for order in object_list %}
+                <div class="row">
+                    <div class="media border p-3">
+                        <div class="media-body">
+                            <p>{{ _('Order') }} №{{ order }} {% if order.sent %}{{ _('order processed')}}{% else %}{{ _('order in processing') }}{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}{{_('Chat')}}{% endblock title %}
+
+{% block content %}
+    <div class="row container mx-auto my-4" style='height: 92vh'>
+        <div class="container col-4 border px-0">
+            <div class='pt-4 pb-1 container w-100 bg-light'>
+                <img src="{% if request.user.photo %}{{ request.user.photo.url }}{% else %}{{ static ('media/user_photo/default_user_photo.png') }}{% endif %}" alt="{{ request.user.img_alt }}" width="32" height="32" class="rounded-circle me-2">
+                <input class='border rounded-pill px-2 mt-3 w-100' placeholder='Searche for start'/>
+            </div>
+            <div id='chat-rooms' class="text-start py-2 text-blue">
+                <div class='mt-2 mb-4 ps-3 text-info'>{{ _('Chats') }}</div>
+                {% if object_list %}
+                    {% for room in object_list %}
+                        <p class="d-flex justify-content-start ps-3 room-names">
+                            {% if not room.private %}
+                                {{ room.name }}
+                            {% else %}
+                                {% for reader in room.readers.all() %}
+                                    {% if reader.pk != request.user.pk %}
+                                        <img src="{% if reader.photo %}{{ reader.photo.url }}{% else %}{{ static ('media/user_photo/default_user_photo.png') }}{% endif %}" alt="{{ reader.img_alt }}" width="32" height="32" class="rounded-circle me-2">
+                                        {% if reader.first_name %}{{ reader.first_name }}{% else %}{{ reader.email }}{% endif %}
+                                    {% endif %}    
+                                {% endfor %}
+                            {% endif %}    
+                        </p>   
+                        <hr/> 
+                    {% endfor %}
+                {% else %}
+                    <div class='my-3 btn btn-primary'>Create new chat</div>
+                {% endif %}    
+            </div>
+        </div>
+        <div class="container col-8 px-0 border">
+            <div class='pt-4 pb-2 container w-100 bg-light d-flex justify-content-start' style='height: 12%'>
+                <img src="{% if request.user.photo %}{{ request.user.photo.url }}{% else %}{{ static ('media/user_photo/default_user_photo.png') }}{% endif %}" alt="{{ request.user.img_alt }}" width="32" height="32" class="rounded-circle me-2">
+                <div>{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.email }}{% endif %}</div>
+            </div>
+            <div id='chat-messages' style='height: 73%' data-url="{{ url('random_jokes') }}"></div>
+            <form action="{{ url('create_message')}}" method="post" class='pt-4 pb-2 container w-100 bg-light' style='height: 15%'>
+                {% csrf_token %}
+                <input class="rounded me-2" name="content" placeholder="{{_('enter your message')}}"/>
+                <button type='submit'>submit</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+    const chatMessages = document.body.querySelector('#chat-messages');
+    const roomsList = document.body.querySelector('#chat-rooms');
+    const allRooms = document.body.querySelectorAll('.room-names')
+
+    async function addAnswerFromChuck(url) {
+        try {
+            let response = await fetch(url, {method: "GET"});
+            if (response.status === 200) {
+                return response;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    roomsList.addEventListener('click', (event) => {
+        let target = event.target
+    
+        if (target.classList.contains('room-names')) {
+            event.preventDefault();
+
+            for (let i = 0; i < allRooms.length; i++) {
+                if (allRooms[i].classList.contains('bg-info')) {
+                    allRooms[i].classList.remove('bg-info')
+                }
+            }
+
+            target.classList.add('bg-info');
+        }
+    });
+</script>
+{% endblock content %}

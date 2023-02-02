@@ -1,0 +1,10 @@
+{% extends "base.jinja2" %}
+
+{% block title %}{{_('Successful activation')}}{% endblock title %}
+
+{% block content %}
+
+<h1>{{ _('Account successfully activated')}}</h1>
+<p>{{ _('Now you can') }}<a href="{{ url('login') }}"> {{ _('login') }} </a>{{ _('using your account') }}</p>
+
+{% endblock %}

@@ -8,6 +8,10 @@ django = "*"
 django-environ = "*"
 python-slugify = "*"
 pillow = "*"
+jinja2 = "*"
+django-crispy-forms = "*"
+django-jinja = "*"
+requests = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"

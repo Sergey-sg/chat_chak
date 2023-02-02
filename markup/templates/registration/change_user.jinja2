@@ -1,0 +1,26 @@
+{% extends "base.jinja2" %}
+
+{% block title %}{{_('Change account')}}{% endblock title %}
+
+{% block content %}
+
+<div class="container padding-form">
+    {%  if 'accounts/login/' in request.META.HTTP_REFERER %}
+        <div>{{ _('Complete information about yourself') }}</div>
+    {% else %}
+        <div>{{ _('Change information about yourself') }}</div>
+    {% endif %}
+    <hr>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table>
+            {% if form.errors %}
+              <p class="text-danger">{{ form.errors }}</p>
+            {% endif %}
+            {{ crispy(form) }}
+        </table>
+        <input class="btn btn-primary" type="submit" value="{{ _('Submit') }}" />
+    </form>
+</div>
+
+{% endblock %}

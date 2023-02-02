@@ -1,0 +1,103 @@
+{% extends "base.jinja2" %}
+
+{% block title %}{{_('Login')}}{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+      {% if user.is_authenticated %}
+        <p>{{ _('Your account does not have access to this page. To continue,
+          please login with an account that has access.') }}</p>
+      {% else %}
+        <p>{{ _('Please login to your account') }}</p>
+      {% endif %}
+
+    <p>{{ message }}</p>
+
+ <div class="container">
+    <div class="row">
+         <div>
+             <a class="btn btn-primary" data-toggle="modal" href="javascript:void(0)" onclick="openLoginModal();">{{ _('login') }}</a>
+             <a class="btn btn-primary" data-toggle="modal" href="javascript:void(0)" onclick="openRegisterModal();">{{ _('register') }}</a>
+         </div>
+    </div>
+ </div>
+
+ <div class="modal fade login" id="loginModal">
+    <div class="modal-dialog login animated">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{ _('Sign in using an account') }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="box">
+                    <div class="content">
+                        <div class="division">
+                            <div class="line l"></div>
+                                <div class="line r"></div>
+                        </div>
+                        <div class="form loginBox">
+                           <form method="post" action="">
+                                {% csrf_token %}
+                                <table>
+                                    <tr>
+                                        {% if form.errors %}
+                                              <p class="text-danger">{{ _('The username and password do not match. Please try again.') }}</p>
+                                        {% endif %}
+                                    </tr>
+                                    {{ form }}
+                                </table>
+                                <br>
+                                <input type="submit" class="btn btn-primary" value="{{ _('login') }}" />
+                                <input type="hidden" name="next" value="{{ url('home') }}" />
+                               {# Assumes you setup the password_reset view in your URLconf #}
+                                <p><a href="{{ url('password_reset') }}">{{ _('forgot your password?') }}?</a></p>
+                           </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="content registerBox" style="display:none;">
+                        <div class="form">
+                            <form action="{{ url('create_user') }}" method="post" enctype="multipart/form-data" id="post-form">
+                                {% csrf_token %}
+                                <table>
+                                    <tr>
+                                        <td>{{ create_user_form.email.label }}:<br>{{ create_user_form.email }}<br>{{ create_user_form.email.help_text|safe }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ create_user_form.password1.label }}:<br>{{ create_user_form.password1 }}<br>{{ create_user_form.password1.help_text|safe }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ create_user_form.password2.label }}:<br>{{ create_user_form.password2 }}<br>{{ create_user_form.password2.help_text|safe }}</td>
+                                    </tr>
+                                </table>
+                                <input class="btn btn-primary" type="submit" value="{{ _('register') }}" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="forgot login-footer">
+                    <span>{{ _('go to') }}
+                        <a href="javascript: showRegisterForm();"> {{ _('create a new account')}}</a>
+                    ?</span>
+                </div>
+                <div class="forgot register-footer" style="display:none">
+                <span>{{ _('already have an account') }}?</span>
+                <a href="javascript: showLoginForm();">{{ _('login') }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+</div>
+
+<script src="https://bootstraptema.ru/plugins/jquery/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://bootstraptema.ru/plugins/2015/b-v3-3-6/bootstrap.min.js"></script>
+<script src="https://bootstraptema.ru/_sf/3/394.js" type="text/javascript"></script>
+<script src="{{ static ('script/password_open.js') }}"></script>
+{% endblock %}

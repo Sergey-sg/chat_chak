@@ -1,0 +1,13 @@
+{% extends "base.jinja2" %}
+
+{% block title %}{{_('Logout')}}{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <p>{{ _('You are logged out')}}!</p>
+
+        <a href="{{ url('login') }}">{{ _('Click here to login again') }}.</a>
+    </div>
+
+{% endblock %}
