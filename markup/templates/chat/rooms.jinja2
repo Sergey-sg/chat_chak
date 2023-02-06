@@ -10,6 +10,7 @@
                 alt="{{ request.user.img_alt }}" width="32" height="32" class="rounded-circle me-2">
             <input class='border rounded-pill px-2 mt-3 w-100' placeholder='Searche for start' />
         </div>
+        
         <div id='chat-rooms' class="text-start py-2 text-blue">
             <div class='mt-2 mb-4 ps-3 text-info'>{{ _('Chats') }}</div>
             {% if object_list %}
@@ -52,85 +53,5 @@
     </div>
 </div>
 
-<script>
-    const chatMessages = document.body.querySelector('#chat-messages');
-    const roomsList = document.body.querySelector('#chat-rooms');
-    const messageForm = document.body.querySelector('#message-form');
-    const discussionRoom = document.body.querySelector('#discussion-room');
-    const activeRoomName = document.body.querySelector("#active-room-name");
-
-    messageForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        setTimeout(addAnswerFromChuck, 15000, chatMessages.getAttribute("data-urlJokes"));
-        //messageForm.submit()
-    })
-
-    async function addAnswerFromChuck(url) {
-        try {
-            let response = await fetch(url, { method: "GET" });
-            if (response.status === 200) {
-                const data = await response.json();
-                createMessageComponent(data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    function createMessageComponent(message) {
-        const messageComponent = document.createElement('p'); 
-        const br = document.createElement('br');
-        const time = document.createElement('span');
-        time.innerText = message.updated;
-        time.classList.add('small');
-        messageComponent.innerText = message.content;
-        messageComponent.appendChild(br);
-        messageComponent.appendChild(time);
-        if (message.author) {
-            messageComponent.classList.add('text-end');
-        }
-        chatMessages.appendChild(messageComponent);
-    }
-
-    async function getMessagesList(url) {
-        try {
-            let response = await fetch(url, {method: "GET"});
-            if (response.status === 200) {    
-                response = await response.json();
-                chatMessages.innerHTML = '';
-                for (let message of response.messagesList) {
-                   createMessageComponent(message) 
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    roomsList.addEventListener('click', (event) => {
-        let target = event.target
-
-        if (target.classList.contains('room-names')) {
-            event.preventDefault();
-            const activeRoom = document.body.querySelector("p.room-names.bg-info")
-
-            if (activeRoom) {
-                activeRoom.classList.remove('bg-info')
-            }
-
-            target.classList.add('bg-info');
-            
-            const roomName = target.getAttribute("data-name");
-            const roomPrivate = target.getAttribute("data-private");
-            const hiddenInputId = document.querySelector("input[name='roomId']");
-            const roomId = target.getAttribute('data-pk')
-
-            hiddenInputId.value = roomId;
-            activeRoomName.innerHTML = target.innerHTML 
-            discussionRoom.style.display = ''
-
-            getMessagesList(target.getAttribute('data-urlMessages'))
-        }
-    });
-</script>
+<script src="{{ static ('script/chuck_jokes.js') }}"></script>
 {% endblock content %}

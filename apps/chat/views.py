@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpResponseNotFound, JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, View, CreateView
 import requests
@@ -22,14 +22,19 @@ class RoomListView(ListView):
 
 class RandomChuckJokes(View):
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
         random_joke = requests.get("https://api.chucknorris.io/jokes/random")
+        data = self.request.POST
+        room = Room.objects.get(pk=int(data['roomId']))
+        message = Message.objects.create(room=room, content=random_joke.json()['value'])
+        print(message)
         return JsonResponse({'author': False, 'content': random_joke.json()['value'], 'status': True, 'updated': datetime.now()})
 
 
 class CreateMessageView(CreateView):
     model = Message
     form_class = MessageForm
+    template_name = 'chat/message_form.jinja2'
 
     def post(self, request, *args, **kwargs):
         self.object = None
@@ -46,7 +51,7 @@ class CreateMessageView(CreateView):
         message_form = form.save(commit=False)
         try:
             room = Room.objects.get(
-                pk=int(self.get_form_kwargs()['data']['roomId']), 
+                pk=int(self.get_form_kwargs()['data']['room']), 
                 readers__in=[author],
             )
             message_form.room = room
@@ -54,8 +59,8 @@ class CreateMessageView(CreateView):
             message_form.content = form.cleaned_data['content']
             message_form.save()
         except Room.DoesNotExist:
-            return JsonResponse({'message': 'room with this user not found', 'status': 404}) 
-        return JsonResponse({'status': 200, 'content': message_form.content})
+            return HttpResponseNotFound({'message': 'room with this user not found', 'status': 404}) 
+        return JsonResponse({'author': True, 'content': message_form.content, 'status': message_form.status, 'updated': message_form.updated})
 
 
 class RoomMessagesList(View):
@@ -64,7 +69,7 @@ class RoomMessagesList(View):
         messages_list = Message.objects.filter(room=self.kwargs['pk'])
         out_list = []
         for message in messages_list:
-            if self.request.user.pk != message.author.pk:
+            if not message.author or self.request.user.pk != message.author.pk:
                 author = False
             else:
                 author = True    
