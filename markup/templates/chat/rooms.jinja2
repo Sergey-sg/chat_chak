@@ -4,18 +4,20 @@
 
 {% block content %}
 <div class="row container mx-auto my-4" style='height: 92vh'>
+    {# Left panel #}
     <div class="container col-4 border px-0">
-        <div class='pt-4 pb-1 container w-100 bg-light'>
+        {# Header #}
+        <div class='pt-4 pb-2 container w-100 bg-light'>
             <img src="{% if request.user.photo %}{{ request.user.photo.url }}{% else %}{{ static ('media/user_photo/default_user_photo.png') }}{% endif %}"
                 alt="{{ request.user.img_alt }}" width="32" height="32" class="rounded-circle me-2">
             <input class='border rounded-pill px-2 mt-3 w-100' placeholder='Searche for start' />
         </div>
-        
+        {# Rooms list #}
         <div id='chat-rooms' class="text-start py-2 text-blue">
             <div class='mt-2 mb-4 ps-3 text-info'>{{ _('Chats') }}</div>
             {% if object_list %}
                 {% for room in object_list %}
-                    <p class="d-flex justify-content-start ps-3 room-names" data-pk="{{ room.pk }}" data-name="{{ room.name }}" data-private="{{ room.private }}" data-urlMessages="{{ url('messages_list', room.pk) }}">
+                    <p class="d-flex justify-content-start ps-3 py-2 my-0 room-names" data-pk="{{ room.pk }}" data-name="{{ room.name }}" data-private="{{ room.private }}" data-urlMessages="{{ url('messages_list', room.pk) }}">
                         {% if not room.private %}
                             {{ room.name }}
                         {% else %}
@@ -28,24 +30,28 @@
                             {% endfor %}
                         {% endif %}
                     </p>
-                    <hr />
+                    <hr class="my-0" />
                 {% endfor %}
             {% else %}
-                <div class='my-3 btn btn-primary'>Create new chat</div>
+                <div class='my-3 btn btn-primary'>{{_('Create new chat')}}</div>
             {% endif %}
         </div>
     </div>
+    {# Chat room #}
     <div class="container col-8 px-0 border">
-        <div id="discussion-room" style='height: 100%; display: none'>
+        <div id="discussion-room" style='height: 92vh; display: none'>
+            {# Chat room header #}
             <div class='pt-4 pb-2 container w-100 bg-light d-flex justify-content-start' style='height: 12%'>
                 <div id="active-room-name">{% if request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.email }}{%
                     endif %}</div>
             </div>
-            <div id='chat-messages' class="container" style='height: 73%; overflow-y: scroll;' data-urlJokes="{{ url('random_jokes') }}"></div>
-            <form id="message-form" action="{{ url('create_message')}}" method="post" class='pt-4 pb-2 container w-100 bg-light'
-                style='height: 15%'>
+            {# Messages list #}
+            <div id='chat-messages' class="container my-3" style='height: 70%; overflow-y: scroll;' data-urlJokes="{{ url('random_jokes') }}"></div>
+            {# Create message form #}
+            <form id="message-form" action="{{ url('create_message')}}" method="post" class='pt-4 container w-100 bg-light'
+                style='height: 18%'>
                 {% csrf_token %}
-                <input class="rounded me-2 py-1" name="content" placeholder="{{_('enter your message')}}" />
+                <input class="rounded-3 me-2 py-1" name="content" placeholder="{{_('enter your message')}}" />
                 <input type="hidden" name="roomId" value=""/>
                 <button class="rounded btn btn-primary" type='submit'>send</button>
             </form>

@@ -17,8 +17,8 @@ async function sendMessage(url, data, csrfToken, roomId) {
             dataType:'json',
         });
         if (response.status === 200) {    
-            response = await response.json();
-            createMessageComponent(response);
+            message = await response.json();
+            createMessageComponent(message);
             setTimeout(addAnswerFromChuck, 15000, chatMessages.getAttribute("data-urlJokes"), roomId);
             const content = document.body.querySelector("input[name='content']");
             content.value = '';
@@ -59,18 +59,22 @@ async function addAnswerFromChuck(url, roomId) {
 }
 
 function createMessageComponent(message) {
-    const messageComponent = document.createElement('p'); 
-    const br = document.createElement('br');
-    const time = document.createElement('span');
-    time.innerText = message.updated;
-    time.classList.add('small');
-    messageComponent.innerText = message.content;
-    messageComponent.appendChild(br);
-    messageComponent.appendChild(time);
-    if (message.author) {
-        messageComponent.classList.add('text-end');
-    }
+    const messageComponent = document.createElement('div'); 
+    const time = document.createElement('small');
+    const content = document.createElement('div');
+    const date = new Date(message.updated);
+    messageComponent.classList += `${message.author? 'd-flex flex-row-reverse text-end' : 'd-flex flex-row'}`
+    time.innerText = date.toLocaleString();
+    time.style.fontSize = '10px';
+    time.classList += `${message.author? 'd-flex flex-row-reverse text-end' : 'd-flex flex-row'} ps-3`;
+    content.classList += `${message.author? 'bg-light text-black' : 'bg-secondary text-light'} px-3 py-2`;
+    content.style.maxWidth = '75%';
+    content.style.borderRadius = '20px';
+    content.innerText = message.content;
+    messageComponent.appendChild(content);
     chatMessages.appendChild(messageComponent);
+    chatMessages.appendChild(time);
+
 }
 
 async function getMessagesList(url) {
